@@ -6,6 +6,7 @@ import com.fasterxml.jackson.core.io.IOContext;
 import com.fasterxml.jackson.core.json.DupDetector;
 import com.fasterxml.jackson.core.json.JsonReadContext;
 import org.msgpack.core.MessageFormat;
+import org.msgpack.core.MessageTypeException;
 import org.msgpack.core.MessageUnpacker;
 import org.msgpack.core.buffer.ArrayBufferInput;
 import org.msgpack.core.buffer.InputStreamBufferInput;
@@ -217,7 +218,11 @@ public class MessagePackParser extends ParserMinimalBase {
 
     @Override
     public byte[] getBinaryValue(Base64Variant b64variant) throws IOException, JsonParseException {
-        return valueHolder.getRef().asBinary().toByteArray();
+        try {
+            return valueHolder.getRef().asBinary().toByteArray();
+        } catch(MessageTypeException e){
+            return valueHolder.getRef().asRaw().toByteArray();
+        }
     }
 
     @Override
